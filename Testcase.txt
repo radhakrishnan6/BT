@@ -1,0 +1,13 @@
+Unit Test case :
+Validate the uploaded file 
+i) check whether we can find .txt file (for now this code can not process other extensions)
+ii)if not it wont return any value 
+
+Check the Data :
+i) validate the data --> check incorrect date value 
+if we found we should ignore the data 
+
+Add multiple End without start and start without End 
+i) to check the whether it is counting session properly we can have  number session
+
+Give different timestamp to check whether it is calculation as per the requirements 
