@@ -3,15 +3,15 @@ const inputfile = process.argv;
 const { Console } = require('console');
 const fs = require('fs');
 var arrfile=[];
-for(var i=0;i<inputfile.length;i++)
+/*for(var i=0;i<inputfile.length;i++)
 {
     printfile(inputfile[i]);
    
     
 
     
-}
-//printfile('input.txt');
+}*/
+printfile('input.txt');
 
 function printfile(file)
 {
@@ -28,142 +28,185 @@ function fnFileProcess(file)
     let x;
     fs.readFile(file, (err, data) => {
         if (err) throw err;
-        collectarray(data.toString().split('\n').map((line)=>line.split(' ')))               
+        collectarray(data.toString().split('\n').map(
+            (line)=>
+                    
+                        line.split(' ')
+                     
+                   ))               
       });
       
 }
 //console.log(...arrfile);
 function collectarray(fileprocessed)
 {
-   // console.log(...fileprocessed);
+    //console.log(...fileprocessed);
+    //let filefiltered =fileprocessed.filter((x)=>x[0].toLowerCase().trim()!==null)
     let processobjofArr =fileprocessed.map(
-    (item)=>item.map((x)=>
-         {
-        let tempobj={};
-        if(x.includes(":"))
-        {
-           tempobj.TimeStamp=x; 
-        }
-        else if(x.toLowerCase().trim() =='start' || x.toLowerCase().trim() =='end' )
-        {
+    (item)=>
+        item.map((x)=>
+      {
+        
            
-            tempobj.Session=x.toLowerCase().trim();
-        }
-        else
-        {
-            tempobj.Name=x;
-        } 
-        return tempobj;
-      }       
+            if(x.toLowerCase().trim() !==""){
+
+                let tempobj={};
+                if(x.includes(":"))
+                    {
+                       tempobj.TimeStamp=x; 
+                    }
+                    else if(x.toLowerCase().trim() =='start' || x.toLowerCase().trim() =='end' )
+                    {
+                       
+                        tempobj.Session=x.toLowerCase().trim();
+                    }
+                    else
+                    {                            
+                      tempobj.Name=(x.trim()!='')?x:'undefined';                                
+                    } 
+                    return tempobj;
+        
+            
+
+
+
+
+            }
+            
+         //console.log(x);    
+        
+     }
+          
       )   
     )
     
-    let processreport = processobjofArr.reduce(getreport,{})
+    processobjectreport(processobjofArr);
+    //let processreport = processobjofArr.reduce(getreport,{})
     
-    if(tempsession.length>0)
-    {
-        
-       for(var j=0;j<tempsession.length;j++)
-       {
-           if(tempsession[j].Session =='start')
-           {
-            
-             let starttimestamp =tempsession[j].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)
-             if(latesttimeofthelog<starttimestamp)
-              {  processreport[tempsession[j].Name].SessionCount++;  } // check if this is a last start this is last record in the log  so just increment the session count 
-              else 
-              {
-                processreport[tempsession[j].Name].SessionCount++;
-                processreport[tempsession[j].Name].TimeStamp=processreport[tempsession[j].Name].TimeStamp+(latesttimeofthelog-starttimestamp);
-                 
-            }
+    
+}
 
-           }
-           else if(tempsession[j].Session =='end')
-           {
-               let endtimestamp =tempsession[j].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)
-               if(firsttimestampofthelog>endtimestamp)
-               {  processreport[tempsession[j].Name].SessionCount++;   
-               } //check if end time stamp is logged as first record  if yes just increment the session count  
-               else 
-               {
-                processreport[tempsession[j].Name].SessionCount++;
-                processreport[tempsession[j].Name].TimeStamp=processreport[tempsession[j].Name].TimeStamp+(endtimestamp-firsttimestampofthelog);
+function processobjectreport(processArr)
+{
+    let processreport = processArr.reduce(getreport,{})
+    if(processreport)
+    {
+        if(tempsession.length>0)
+            {
                 
+               for(var j=0;j<tempsession.length;j++)
+               {
+                   if(tempsession[j].Session =='start')
+                   {
+                    
+                     let starttimestamp =tempsession[j].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)
+                     if(latesttimeofthelog<starttimestamp)
+                      {  processreport[tempsession[j].Name].SessionCount++;  } // check if this is a last start this is last record in the log  so just increment the session count 
+                      else 
+                      {
+                        processreport[tempsession[j].Name].SessionCount++;
+                        processreport[tempsession[j].Name].TimeStamp=processreport[tempsession[j].Name].TimeStamp+(latesttimeofthelog-starttimestamp);
+                         
+                    }
+        
+                   }
+                   else if(tempsession[j].Session =='end')
+                   {
+                       let endtimestamp =tempsession[j].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)
+                       if(firsttimestampofthelog>endtimestamp)
+                       {  processreport[tempsession[j].Name].SessionCount++;   
+                       } //check if end time stamp is logged as first record  if yes just increment the session count  
+                       else 
+                       {
+                        processreport[tempsession[j].Name].SessionCount++;
+                        processreport[tempsession[j].Name].TimeStamp=processreport[tempsession[j].Name].TimeStamp+(endtimestamp-firsttimestampofthelog);
+                        
+                       }
+                   }
                }
-           }
-       }
+            }
+            console.log(processreport);
+        
+  
     }
-    console.log(processreport);
-    
+        
 }
 
 let tempsession =[];
 let firsttimestampofthelog='';
 let latesttimeofthelog='';
 function getreport(acc,item)
-{
-    // console.log(item[0]);
-   
-    const uniqueName = item[1].Name;
-    
-       
-        if (!acc[uniqueName]) {
-            acc[uniqueName] = {'SessionCount':0,'TimeStamp':0};
-        }
-        let arrSession = tempsession.filter((x)=>(x.Name==item[1].Name))
-        //console.log(item[1].Name);
-        if(arrSession.length>0)
+{  
+        //let validationbool=item.filter((x)=>x == undefined)   
+        if(item[0] !== undefined )
         {
-            let prevtimestampinsec // =tempsession[arrSessioninx].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)
-            let currenttimestampinsec//=item[0].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time);
-            if(item[2].Session=='end')
+           
+            const uniqueName = item[1].Name;   
+            if (!acc[uniqueName]) {
+                acc[uniqueName] = {'SessionCount':0,'TimeStamp':0};
+            }
+            let arrSession = tempsession.filter((x)=>(x.Name==item[1].Name))
+            //console.log(item[1].Name);
+            if(arrSession.length>0)
             {
-                let arrsessioninx =tempsession.findIndex((x)=>(x.Name==item[1].Name && x.Session=='start'))
-                prevtimestampinsec  =tempsession[arrsessioninx].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)
-                currenttimestampinsec=item[0].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time);
-                latesttimeofthelog=(latesttimeofthelog<currenttimestampinsec)?currenttimestampinsec:latesttimeofthelog;
-                
-                if(tempsession[arrsessioninx].Session=='start')
-                { 
-                     acc[uniqueName].SessionCount++;
-                     acc[uniqueName].TimeStamp=acc[uniqueName].TimeStamp+(currenttimestampinsec-prevtimestampinsec);
-                     tempsession.splice(arrsessioninx,1);
-                }
-                else if(tempsession[arrsessioninx].Session=='end')
+                let prevtimestampinsec // =tempsession[arrSessioninx].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)
+                let currenttimestampinsec//=item[0].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time);
+                if(item[2].Session=='end')
                 {
+                    let arrsessioninx =tempsession.findIndex((x)=>(x.Name==item[1].Name && x.Session=='start'))
+                    prevtimestampinsec  =tempsession[arrsessioninx].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)
+                    currenttimestampinsec=item[0].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time);
+                    latesttimeofthelog=(latesttimeofthelog<currenttimestampinsec)?currenttimestampinsec:latesttimeofthelog;
+                    
+                    if(tempsession[arrsessioninx].Session=='start')
+                    { 
+                         acc[uniqueName].SessionCount++;
+                         acc[uniqueName].TimeStamp=acc[uniqueName].TimeStamp+(currenttimestampinsec-prevtimestampinsec);
+                         tempsession.splice(arrsessioninx,1);
+                    }
+                    else if(tempsession[arrsessioninx].Session=='end')
+                    {
+                        tempsession.push(
+                            {'TimeStamp':item[0].TimeStamp,
+                            'Name':item[1].Name,
+                            'Session':item[2].Session
+                        })     
+                    }
+                }
+                else if(item[2].Session=='start')
+                {
+                   
                     tempsession.push(
                         {'TimeStamp':item[0].TimeStamp,
                         'Name':item[1].Name,
                         'Session':item[2].Session
-                    })     
+                    }) 
                 }
-            }
-            else if(item[2].Session=='start')
+                            
+            }  
+            else
             {
-               
+               //  console.log(arrSessioninx);
+                if(firsttimestampofthelog==''){firsttimestampofthelog=item[0].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)};
                 tempsession.push(
                     {'TimeStamp':item[0].TimeStamp,
                     'Name':item[1].Name,
                     'Session':item[2].Session
-                }) 
+                })
             }
-                        
-        }  
-        else
-        {
-           //  console.log(arrSessioninx);
-            if(firsttimestampofthelog==''){firsttimestampofthelog=item[0].TimeStamp.split(':').reduce((acc,time) => (60 * acc) + +time)};
-            tempsession.push(
-                {'TimeStamp':item[0].TimeStamp,
-                'Name':item[1].Name,
-                'Session':item[2].Session
-            })
-        }
-        ///check whether the tempsession have any log value left 
-      
-        
+            ///check whether the tempsession have any log value left 
+          
+            
+              
+    
+
+
+        }   
         return acc
+
+
+    
+   
    /*let temparray={};
    var filterarr =item.map((x)=>
    {
