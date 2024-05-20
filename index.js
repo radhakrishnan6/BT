@@ -3,15 +3,11 @@ const inputfile = process.argv;
 const { Console } = require('console');
 const fs = require('fs');
 var arrfile=[];
-/*for(var i=0;i<inputfile.length;i++)
+for(var i=0;i<inputfile.length;i++)
 {
-    printfile(inputfile[i]);
-   
-    
-
-    
-}*/
-printfile('input.txt');
+    printfile(inputfile[i]);    
+}
+//printfile('input.txt');
 
 function printfile(file)
 {
