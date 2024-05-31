@@ -1,7 +1,17 @@
 Unit Test case :
 Validate the uploaded file 
 i) check whether we can find .txt file (for now this code can not process other extensions)
-ii)if not it wont return any value 
+if(file.includes('.txt'))
+ {        
+   fnFileProcess(file)      // process the file    
+ } 
+else
+{
+   console.log('Invalid file extension')
+}
+ii)Check whether the file is empty or not
+
+
 
 Check the Data :
 i) validate the data --> check incorrect date value 
