@@ -10,13 +10,50 @@ else
    console.log('Invalid file extension')
 }
 ii)Check whether the file is empty or not
-
+let x;
+    fs.readFile(file, (err, data) => {
+        if (err) throw err;
+        
+        if(data.length !==0) 
+        {
+            collectarray(data.toString().split('\n').map(
+                (line)=>                       
+                        line.split(' ')                        
+            )) 
+        }
+        else
+       {
+        console.log("file is empty");
+       } 
 
 
 Check the Data :
 i) validate the data --> check incorrect date value 
 if we found we should ignore the data 
+if(x.toLowerCase().trim() !==""){
 
+                let tempobj={};
+                if(x.includes(":"))
+                    {
+                       tempobj.TimeStamp=x; 
+                    }
+                    else if(x.toLowerCase().trim() =='start' || x.toLowerCase().trim() =='end' )
+                    {
+                       
+                        tempobj.Session=x.toLowerCase().trim();
+                    }
+                    else
+                    {                            
+                      tempobj.Name=(x.trim()!='')?x:'undefined';                                
+                    } 
+                    return tempobj;
+
+            } 
+            else
+           {
+              //do nothing ignore that line 
+           } 
+         
 Add multiple End without start and start without End 
 i) to check the whether it is counting session properly we can have  number session
 
